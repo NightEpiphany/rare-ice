@@ -29,13 +29,19 @@ public class RareIceBlockEntityRenderer implements BlockEntityRenderer<RareIceBl
     @Override
     public void render(RareIceBlockEntity blockEntity, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
         if (blockEntity.isRemoved()) return;
+//        if (locations.isEmpty()) {
+//            assert blockEntity.getLevel() != null;
+//            RandomSource random = blockEntity.getLevel().random;
+//            for (var i = 0; i < contained.size(); i++) {
+//                locations.add(new ItemLocation(random.nextDouble() * .85 + .1, random.nextDouble() * .7 + .1, random.nextDouble() * .85 + .1));
+//            }
+//        }
         NonNullList<ItemStack> contained = blockEntity.getItemsContained();
         List<ItemLocation> locations = blockEntity.getItemsLocations();
-        if (locations.isEmpty()) {
-            RandomSource random = blockEntity.getLevel().random;
-            for (var i = 0; i < contained.size(); i++) {
-                locations.add(new ItemLocation(random.nextDouble() * .95 + .1, random.nextDouble() * .7 + .1, random.nextDouble() * .95 + .1));
-            }
+
+
+        if (locations.size() < contained.size()) {
+            return;
         }
 
         if (blockEntity.getLevel() == null || blockEntity.getLevel().isClientSide()) {

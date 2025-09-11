@@ -21,7 +21,6 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.ChestMenu;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -44,13 +43,13 @@ public class RareIceBlockEntity extends RandomizableContainerBlockEntity impleme
     private final List<ItemLocation> itemsLocations;
     private boolean setup = false;
     private int delay = 0;
-    
+
     public RareIceBlockEntity(BlockPos pos, BlockState state) {
         super(RareIce.RARE_ICE_BLOCK_ENTITY_TYPE, pos, state);
         this.itemsContained = NonNullList.create();
         this.itemsLocations = new ArrayList<>();
     }
-    
+
     @Override
     public void clearContent() {
         this.itemsContained.clear();
@@ -66,11 +65,11 @@ public class RareIceBlockEntity extends RandomizableContainerBlockEntity impleme
     public NonNullList<ItemStack> getItemsContained() {
         return itemsContained;
     }
-    
+
     public List<ItemLocation> getItemsLocations() {
         return itemsLocations;
     }
-    
+
 
 
     @Override
@@ -84,6 +83,9 @@ public class RareIceBlockEntity extends RandomizableContainerBlockEntity impleme
         if (!this.trySaveLootTable(compoundTag)) {
             ContainerHelper.saveAllItems(compoundTag, this.itemsContained, provider);
         }
+        for (int i = 0; i < this.itemsContained.size(); i++) {
+            this.getItemsLocations().get(i).toTag(compoundTag, i);
+        }
     }
 
     @Override
@@ -92,6 +94,9 @@ public class RareIceBlockEntity extends RandomizableContainerBlockEntity impleme
         this.itemsContained = NonNullList.withSize(this.getContainerSize(), ItemStack.EMPTY);
         if (!this.tryLoadLootTable(compoundTag)) {
             ContainerHelper.loadAllItems(compoundTag, this.itemsContained, provider);
+        }
+        for (int i = 0; i < this.itemsContained.size(); i++) {
+            this.getItemsLocations().add(ItemLocation.fromTag(compoundTag, i));
         }
     }
 
@@ -118,7 +123,7 @@ public class RareIceBlockEntity extends RandomizableContainerBlockEntity impleme
     public void addLootTable(Level world) {
         setup = true;
     }
-    
+
     public static void tick(Level world, BlockPos pos, BlockState blockState, RareIceBlockEntity blockEntity) {
         if (blockEntity.setup) {
             blockEntity.setup = false;
@@ -144,11 +149,11 @@ public class RareIceBlockEntity extends RandomizableContainerBlockEntity impleme
             blockEntity.delay = 0;
         }
     }
-    
-    public InteractionResult addItem(Level world, ItemStack itemStack, Player nullablePlayer) {
-        return addItem(world, itemStack, nullablePlayer, true);
+
+    public void addItem(Level world, ItemStack itemStack, Player nullablePlayer) {
+        addItem(world, itemStack, nullablePlayer, true);
     }
-    
+
     public InteractionResult addItem(Level world, ItemStack itemStack, Player nullablePlayer, boolean actuallyDoIt) {
 
         if (itemStack.isEmpty() || itemStack.getCount() < 1) {
@@ -164,8 +169,13 @@ public class RareIceBlockEntity extends RandomizableContainerBlockEntity impleme
                 ItemStack copy = itemStack.copyWithCount(1);
                 getItemsContained().add(copy);
                 itemStack.shrink(1);
-                RandomSource random = world.random;
-                getItemsLocations().add(new ItemLocation(random.nextDouble() * .95 + .1, random.nextDouble() * .7 + .1, random.nextDouble() * .95 + .1));
+                ItemLocation itemLocation = new ItemLocation(
+                        RANDOM.nextDouble() * .85 + .1,
+                        RANDOM.nextDouble() * .7 + .1,
+                        RANDOM.nextDouble() * .85 + .1,
+                        (float) (Math.random() * 360.0F),
+                        (float) (Math.random() * 360.0F));
+                getItemsLocations().add(itemLocation);
                 updateListeners();
             }
             if (nullablePlayer != null && world.isClientSide())
@@ -174,7 +184,7 @@ public class RareIceBlockEntity extends RandomizableContainerBlockEntity impleme
         }
         return InteractionResult.CONSUME;
     }
-    
+
     private void updateListeners() {
         this.setChanged();
         assert this.getLevel() != null;
@@ -183,6 +193,6 @@ public class RareIceBlockEntity extends RandomizableContainerBlockEntity impleme
 
     @Override
     public int getContainerSize() {
-        return 10;
+        return 8;
     }
 }

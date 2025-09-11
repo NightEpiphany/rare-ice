@@ -57,7 +57,6 @@ public class RareIceBlock extends BaseEntityBlock {
         }
     }
     
-    @SuppressWarnings("deprecation")
     @Deprecated
     @Override
     public void onRemove(BlockState state, Level world, BlockPos pos, BlockState newState, boolean moved) {
@@ -71,7 +70,6 @@ public class RareIceBlock extends BaseEntityBlock {
     }
     
     @Environment(EnvType.CLIENT)
-    @SuppressWarnings("deprecation")
     @Deprecated
     public boolean skipRendering(BlockState state, BlockState neighbor, Direction facing) {
         return neighbor.getBlock() == this || neighbor.getBlock() == Blocks.ICE || super.skipRendering(state, neighbor, facing);
@@ -92,7 +90,6 @@ public class RareIceBlock extends BaseEntityBlock {
         }
     }
 
-    @SuppressWarnings("deprecation")
     @Deprecated
     @Override
     public void tick(BlockState state, ServerLevel world, BlockPos pos, RandomSource random) {
